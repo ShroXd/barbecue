@@ -2,35 +2,49 @@ package com.atriiy.barbecue;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
+import java.util.function.Supplier;
+
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod(Barbecue.MODID)
+@Mod(Barbecue.MOD_ID)
 public class Barbecue
 {
-    public static final String MODID = "barbecue";
+    public static final String MOD_ID = "barbecue";
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final CreativeModeTab MY_CREATIVE_TAB = ModCreativeTab.INSTANCE;
+
+    public static class ModCreativeTab extends CreativeModeTab {
+        private static final String TAB_NAME = "Barbecue";
+        private static final Item DEFAULT_ICON = Items.PORKCHOP;
+        public static final ModCreativeTab INSTANCE = new ModCreativeTab(CreativeModeTab.TABS.length, TAB_NAME);
+
+        private final Supplier<ItemStack> iconSupplier;
+
+        private ModCreativeTab(int index, String label) {
+            super(index, label);
+            this.iconSupplier = () -> new ItemStack(DEFAULT_ICON);
+        }
+
+        @Override
+        public ItemStack makeIcon() {
+            return iconSupplier.get();
+        }
+    }
 
     public Barbecue()
     {
@@ -59,7 +73,7 @@ public class Barbecue
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientModEvents
     {
         @SubscribeEvent
