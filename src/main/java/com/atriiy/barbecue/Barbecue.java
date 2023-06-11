@@ -1,5 +1,6 @@
 package com.atriiy.barbecue;
 
+import com.atriiy.barbecue.init.ItemInit;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.CreativeModeTab;
@@ -22,11 +23,10 @@ import java.util.function.Supplier;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Barbecue.MOD_ID)
-public class Barbecue
-{
+public class Barbecue {
     public static final String MOD_ID = "barbecue";
     private static final Logger LOGGER = LogUtils.getLogger();
-    public static final CreativeModeTab MY_CREATIVE_TAB = ModCreativeTab.INSTANCE;
+    public static final CreativeModeTab MOD_CREATIVE_TAB = ModCreativeTab.INSTANCE;
 
     public static class ModCreativeTab extends CreativeModeTab {
         private static final String TAB_NAME = "Barbecue";
@@ -46,19 +46,20 @@ public class Barbecue
         }
     }
 
-    public Barbecue()
-    {
+    public Barbecue() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
+        // Init
+        ItemInit.ITEMS.register(modEventBus);
+
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
+    private void commonSetup(final FMLCommonSetupEvent event) {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP");
         LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
@@ -66,19 +67,17 @@ public class Barbecue
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event)
-    {
+    public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         LOGGER.info("HELLO from server starting");
     }
 
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
+    // You can use EventBusSubscriber to automatically register all static methods
+    // in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class ClientModEvents
-    {
+    public static class ClientModEvents {
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
+        public static void onClientSetup(FMLClientSetupEvent event) {
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
